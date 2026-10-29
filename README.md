@@ -117,7 +117,6 @@ Our project thoughtfully adapts, integrates, and modifies methodologies from thr
   - `matplotlib` (>= 3.7.0): Headless publication-grade plotting (`matplotlib.use('Agg')`). Zero seaborn dependency!
   - `networkx` (>= 3.0): Graph modeling, node/edge attributes, topological sorting.
   - `pytest` (>= 7.0.0): Automated testing framework.
-  - `streamlit` (>= 1.20.0): Optional interactive web dashboard.
 
 ---
 
@@ -157,13 +156,12 @@ Ensure Python 3.10+ is installed on your operating system (Windows, Linux, or ma
 ```
 final_project/
 ├── requirements.txt                   # Standard familiar undergraduate dependencies
-├── main.py                            # Master CLI demonstrator: 30-day simulation + 8 scenarios
-├── dashboard.py                       # Interactive Streamlit public health web dashboard
+├── main.py                            # Master CLI entrypoint: 30-day simulation + 8 scenarios + benchmarks + plots
 ├── README.md                          # Comprehensive 21-section viva documentation (this file)
 │
 ├── data/                              # Synthetic datasets & schema adapters
-│   ├── generator.py                   # Deterministic seeded synthetic data generator (seed=42)
-│   ├── opendengue_loader.py           # Ingestion adapter for OpenDengue standardized CSV schemas
+│   ├── generator.py                   # Data generator redirect script
+│   ├── opendengue_loader.py           # OpenDengue loader redirect script
 │   ├── zones_demographics.csv         # 6 municipal wards with population, area, vulnerability, coords
 │   ├── city_infrastructure.csv        # 5 facilities: hospitals, diagnostic labs, vector control depots
 │   ├── spatial_network_edges.csv      # 20 road network edges with physical distance (km) and travel time (min)
@@ -174,79 +172,27 @@ final_project/
 │   ├── domain.pddl                    # STRIPS/PDDL domain definition (types, predicates, 8 actions)
 │   └── problem.pddl                   # PDDL problem instance for urban outbreak containment
 │
-├── src/                               # Modular Python source packages
-│   ├── __init__.py                    # Package initializer
-│   │
-│   ├── core/                          # Digital-Twin shared state engine
-│   │   ├── __init__.py
-│   │   ├── city_state.py              # CityState digital-twin object, ZoneSnapshot, PlanStep, RoutingResult
-│   │   └── utils.py                   # Haversine geodetic distance formula, path resolution, logging
-│   │
-│   ├── search/                        # Module 1: Spatial Graph & Search Algorithms
-│   │   ├── __init__.py
-│   │   ├── graph_model.py             # SpatialCityGraph convenience wrapper over NetworkX graphs
-│   │   ├── algorithms.py              # BFS, DFS, UCS, A* explicit classroom implementations
-│   │   ├── heuristics.py              # Provably admissible & consistent Haversine velocity heuristic
-│   │   └── evaluator.py               # Patient hospital diversion, multi-stop team routes, cluster search
-│   │
-│   ├── csp/                           # Module 1: Constraint Satisfaction Problem
-│   │   ├── __init__.py
-│   │   ├── csp_model.py               # Generic CSP formulation (Variables, Domains, Constraints)
-│   │   ├── solver.py                  # AC-3 Arc Consistency, Backtracking with Forward Checking, MRV/LCV
-│   │   ├── resource_allocator.py      # Municipal allocation of teams, test kits, and surge beds
-│   │   └── conflict_explainer.py      # Shortage diagnostics, bottleneck explanation, relaxed best-effort
-│   │
-│   ├── planning/                      # Module 2: Automated Intervention Planning
-│   │   ├── __init__.py
-│   │   ├── actions.py                 # STRIPS ActionSchema definitions for all 8 municipal interventions
-│   │   ├── planner.py                 # Forward state-space planner & concurrent stage partitioner
-│   │   ├── cpm.py                     # Critical Path Method: Earliest/Latest Start/Finish & Slack calculation
-│   │   ├── execution_monitor.py       # Online replanner: Surge, Team Outage, Rain Washout, Weak Efficacy
-│   │   └── pddl_exporter.py           # Exports and validates formal PDDL domain and problem files
-│   │
-│   ├── uncertainty/                   # Module 3: Reasoning Under Uncertainty
-│   │   ├── __init__.py
-│   │   ├── bayes_net.py               # Directed Acyclic Graph (DAG) & verified CPT tables
-│   │   ├── factor.py                  # Factor math: pointwise product, marginalization, evidence reduction
-│   │   ├── inference.py               # Exact Variable Elimination & Enumeration algorithms
-│   │   ├── risk_estimator.py          # Zone true risk estimator, latent under-reporting detector
-│   │   └── confidence.py              # Shannon entropy confidence quantification (0.0 to 1.0)
-│   │
-│   ├── rl/                            # Module 4: MDP & Reinforcement Learning
-│   │   ├── __init__.py
-│   │   ├── environment.py             # Coupled G-SEIR host-vector simulation environment (72 states)
-│   │   ├── mdp_solver.py              # Bellman Optimality Value Iteration & Policy Iteration
-│   │   ├── q_learning.py              # Model-free Tabular Q-Learning agent with epsilon decay
-│   │   ├── sarsa.py                   # Model-free On-policy SARSA agent implementation
-│   │   └── baseline_comparison.py     # Comparative evaluation against No-Action, Random, Greedy
-│   │
-│   ├── coordinator/                   # Integrated Decision Coordinator
-│   │   ├── __init__.py
-│   │   ├── system_coordinator.py      # Master coordinator connecting Modules 3 -> 1 -> 2 -> 4
-│   │   └── advisory_generator.py      # Deterministic public-health SITREPs & alerts (100% Python, NO LLM)
-│   │
-│   ├── scenarios/                     # Mandatory Scenario Evaluation Suite
-│   │   ├── __init__.py
-│   │   └── scenario_runner.py         # Evaluates all 8 required public-health disruption scenarios
-│   │
-│   └── visualizer/                    # Publication-Grade Visualizations (Pure Matplotlib)
-│       ├── __init__.py
-│       └── plotter.py                 # Generates 8 publication-grade figures in outputs/plots/
+├── src/                               # Consolidated, clean core modules
+│   ├── __init__.py                    # Unified package exports
+│   ├── city_state.py                  # CityState digital-twin, ZoneSnapshot, PlanStep, RoutingResult, Haversine utils
+│   ├── data_generator.py              # Seeded synthetic generator (seed=42) & OpenDengue ingestion adapter
+│   ├── module1_search.py              # Module 1: BFS, DFS, UCS, A* (Haversine heuristic), SearchEvaluator
+│   ├── module1_csp.py                 # Module 1: CSP, AC-3, Backtracking (MRV/LCV), DengueResourceAllocator, Explainer
+│   ├── module2_planning.py            # Module 2: STRIPS actions, Planner, CPM, OnlineExecutionMonitor, PDDL export
+│   ├── module3_uncertainty.py         # Module 3: Factor math, BayesNet, VariableElimination, Under-Reporting, Entropy
+│   ├── module4_rl.py                  # Module 4: Coupled G-SEIR simulation env, MDP Solver, Q-Learning, SARSA, Baselines
+│   ├── coordinator.py                 # Master AdaptiveDengueCoordinator & deterministic SITREP generator
+│   ├── scenario_runner.py             # Evaluator for all 8 mandatory public-health stress scenarios
+│   └── visualizer.py                  # Publication-grade plotting engine for all 8 figures (Pure Matplotlib)
 │
-├── tests/                             # Comprehensive automated test suite (pytest)
+├── tests/                             # Consolidated test suite (pytest)
 │   ├── __init__.py
-│   ├── test_search.py                 # Unit tests for BFS, DFS, UCS, A*, and heuristic admissibility
-│   ├── test_csp.py                    # Unit tests for AC-3, Forward Checking, MRV/LCV, and conflict explanation
-│   ├── test_planning.py               # Unit tests for action schemas, parallel stages, CPM, and replanning
-│   ├── test_uncertainty.py            # Unit tests for CPT normalization, factor math, VE, and under-reporting
-│   ├── test_rl.py                     # Unit tests for G-SEIR dynamics, Bellman solver, Q-Learning, and SARSA
-│   ├── test_integration.py            # Full end-to-end pipeline test on CityState
-│   └── test_scenarios.py              # Automated test runner across all 8 disruption scenarios
+│   └── test_all.py                    # Complete test suite: 29 unit, integration, and scenario tests
 │
 └── outputs/                           # Verifiable output artifacts generated on disk
     ├── logs/                          # Daily simulation JSON state logs (city_state_day01.json to day30.json)
     ├── reports/                       # scenario_evaluation_report.md
-    ├── tables/                        # search_benchmarks.csv, rl_policy_comparison.csv, cpm_schedule_table.csv
+    ├── tables/                        # CSV and JSON benchmark and policy comparison tables
     └── plots/                         # 8 publication-grade PNG plots (Gantt, heatmaps, learning curves)
 ```
 

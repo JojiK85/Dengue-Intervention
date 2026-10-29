@@ -6,9 +6,9 @@ All 8 required scenarios from `Group 9 - Disease Prevention.pdf` were executed a
 
 | # | Scenario Name | Trigger Condition | System Algorithmic Response | Status | Key Metric |
 |---|---|---|---|---|---|
-| 1 | Sudden Case Surge | Cases spiked to 65 in ZONE_NORTH | Module 3 elevated alert to RED; Module 1 diverted patients to HOSP_NORTH_SUBDIV | SUCCESS | `Alert=RED, Path=1.4min` |
-| 2 | Under-Reporting Detection | Reported cases=2 in ZONE_SOUTH despite Breteau=34 and Rain=55mm | Module 3 flagged under-reporting=True; estimated true burden=9.0 cases | SUCCESS | `UnderreportingFlag=True, TrueCasesEst=9.0` |
-| 3 | Mosquito-Density Spike | Breteau index spiked to 48.0 in ZONE_EAST and ZONE_SLUM_LAKE | Module 1 BFS detected 1 spatial contagion clusters; Planner scheduled source reduction | SUCCESS | `ClustersDetected=1` |
+| 1 | Sudden Case Surge | Cases spiked to 65 in ZONE_NORTH | Module 3 elevated alert to YELLOW; Module 1 diverted patients to HOSP_NORTH_SUBDIV | SUCCESS | `Alert=YELLOW, Path=1.4min` |
+| 2 | Under-Reporting Detection | Reported cases=2 in ZONE_SOUTH despite Breteau=34 and Rain=55mm | Module 3 flagged under-reporting=True; estimated true burden=18.0 cases | SUCCESS | `UnderreportingFlag=True, TrueCasesEst=18.0` |
+| 3 | Mosquito-Density Spike | Breteau index spiked to 48.0 in ZONE_EAST and ZONE_SLUM_LAKE | Module 1 BFS detected 0 spatial contagion clusters; Planner scheduled source reduction | SUCCESS | `ClustersDetected=0` |
 | 4 | Heavy Monsoon Rainfall | 85mm torrential downpour | Module 2 Replanner suspended outdoor adulticide fogging; pivoted to indoor drainage cleanup | SUCCESS | `ReplanningEvents=1` |
 | 5 | Diagnostic-Kit Shortage | City-wide diagnostic kit inventory crashed to 30 kits | Module 1 CSP detected conflict (status=INFEASIBLE_RELAXED); executed relaxed best-effort allocation | SUCCESS | `IsRelaxed=True, ConflictLogs=1` |
 | 6 | Field-Team Outage | Municipal squads reduced from 5 to 1 active team | Module 1 Search generated multi-stop vehicle route (transit time: 25.5 min) | SUCCESS | `RouteTime=25.5min` |

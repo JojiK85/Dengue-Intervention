@@ -1,8 +1,5 @@
-# Group 9: Adaptive Dengue Surveillance and Intervention Coordinator
-# Familiar Undergraduate Libraries for 3rd/4th Year BTech CSE (IIT Bhubaneswar)
 numpy>=1.24.0
 pandas>=2.0.0
 matplotlib>=3.7.0
 networkx>=3.0
 pytest>=7.0.0
-streamlit>=1.20.0
