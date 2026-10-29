@@ -1,0 +1,106 @@
+{
+  "day": 8,
+  "city_summary": {
+    "day": 8,
+    "total_zones": 6,
+    "total_confirmed_cases": 72.0,
+    "total_estimated_true_cases": 243.0,
+    "total_beds_occupied": 126,
+    "total_diagnostic_kits_remaining": 270,
+    "high_risk_zones": [
+      "ZONE_CENTRAL",
+      "ZONE_NORTH",
+      "ZONE_SOUTH",
+      "ZONE_EAST",
+      "ZONE_WEST"
+    ],
+    "underreporting_zones": [
+      "ZONE_SLUM_LAKE"
+    ]
+  },
+  "csp_status": "INFEASIBLE_RELAXED",
+  "csp_is_relaxed": true,
+  "csp_conflicts": [
+    "Diagnostic Kit Stockout: Total municipal requirement of 410 test kits exceeds inventory of 350 kits (deficit: 60)."
+  ],
+  "routing_actions": [
+    {
+      "origin_zone": "ZONE_CENTRAL",
+      "assigned_hospital": "HOSP_CIVIL_CENTRAL",
+      "available_beds": 25,
+      "path": [
+        "ZONE_CENTRAL",
+        "HOSP_CIVIL_CENTRAL"
+      ],
+      "travel_time_min": 0.4,
+      "nodes_expanded": 2
+    },
+    {
+      "origin_zone": "ZONE_NORTH",
+      "assigned_hospital": "HOSP_NORTH_SUBDIV",
+      "available_beds": 8,
+      "path": [
+        "ZONE_NORTH",
+        "HOSP_NORTH_SUBDIV"
+      ],
+      "travel_time_min": 1.4,
+      "nodes_expanded": 2
+    },
+    {
+      "origin_zone": "ZONE_SOUTH",
+      "assigned_hospital": "HOSP_SOUTH_GENERAL",
+      "available_beds": 5,
+      "path": [
+        "ZONE_SOUTH",
+        "HOSP_SOUTH_GENERAL"
+      ],
+      "travel_time_min": 1.7,
+      "nodes_expanded": 2
+    },
+    {
+      "origin_zone": "ZONE_EAST",
+      "assigned_hospital": "HOSP_SOUTH_GENERAL",
+      "available_beds": 5,
+      "path": [
+        "ZONE_EAST",
+        "ZONE_SOUTH",
+        "HOSP_SOUTH_GENERAL"
+      ],
+      "travel_time_min": 10.2,
+      "nodes_expanded": 3
+    },
+    {
+      "origin_zone": "ZONE_WEST",
+      "assigned_hospital": "HOSP_NORTH_SUBDIV",
+      "available_beds": 8,
+      "path": [
+        "ZONE_WEST",
+        "HOSP_NORTH_SUBDIV"
+      ],
+      "travel_time_min": 10.1,
+      "nodes_expanded": 3
+    }
+  ],
+  "planning_stages_count": 5,
+  "critical_path": [
+    "T1_surveillance_ZONE_CENTRAL",
+    "T3_field_inspection_ZONE_CENTRAL",
+    "T5_source_reduction_ZONE_CENTRAL",
+    "T8_surveillance_ZONE_EAST",
+    "T10_field_inspection_ZONE_EAST",
+    "T12_source_reduction_ZONE_EAST",
+    "T15_surveillance_ZONE_NORTH",
+    "T17_field_inspection_ZONE_NORTH",
+    "T19_source_reduction_ZONE_NORTH",
+    "T23_surveillance_ZONE_SOUTH",
+    "T25_field_inspection_ZONE_SOUTH",
+    "T27_source_reduction_ZONE_SOUTH",
+    "T30_surveillance_ZONE_WEST",
+    "T32_field_inspection_ZONE_WEST",
+    "T34_source_reduction_ZONE_WEST"
+  ],
+  "project_duration_days": 4.0,
+  "rl_action_selected": "5_Combined_Intervention_Sweep",
+  "rl_step_reward": -14.34,
+  "sitrep": "# MUNICIPAL DENGUE SITUATION REPORT (SITREP) - DAY 08\n**Jurisdiction:** Urban Municipal Corporation | **Surveillance Cycle:** Longitudinal 30-Day Simulation\n**Deterministic Decision-Support Engine:** Modules 1-4 (Search, CSP, Planning, Bayes Net, MDP/RL)\n---\n### 1. Epidemiological Summary\n- **Total Clinically Reported Cases:** 72.0\n- **Estimated True Infection Burden:** 243.0 (accounting for under-reporting multipliers)\n- **Hospital Surge Bed Occupancy:** 126 occupied\n- **Diagnostic Test Kits Remaining:** 270\n- **High-Risk Wards (Alert ORANGE/RED):** ZONE_CENTRAL, ZONE_NORTH, ZONE_SOUTH, ZONE_EAST, ZONE_WEST\n- **Latent Under-Reporting Alerts:** ZONE_SLUM_LAKE\n\n### 2. Algorithmic Decisions & Resource Directives\n- **Module 3 (Bayesian Network):** Exact Variable Elimination inferred true outbreak risks; detected 1 under-reported sectors.\n- **Module 1 (CSP Allocator):** Allocation status: **INFEASIBLE_RELAXED**. Enforced strict team travel times and high-risk coverage constraints.\n- **Module 2 (Intervention Planning):** Critical path activities governing schedule: `T1_surveillance_ZONE_CENTRAL, T3_field_inspection_ZONE_CENTRAL, T5_source_reduction_ZONE_CENTRAL`.\n\n### 3. Public Health Guidance & Preventative Advisories\n**Ward ZONE_CENTRAL (Alert ORANGE, True Risk 0.49, Confidence 0.09):**\n  - Vector Control Directive: Immediate adulticide spraying and source reduction authorized.\n  - Clinical Guidance: Mobilize triage beds at nearest referral facility; distribute diagnostic kits.\n  - Citizen Advisory: Empty stagnant water coolers and overhead containers within 48 hours.\n**Ward ZONE_NORTH (Alert RED, True Risk 0.78, Confidence 0.46):**\n  - Vector Control Directive: Immediate adulticide spraying and source reduction authorized.\n  - Clinical Guidance: Mobilize triage beds at nearest referral facility; distribute diagnostic kits.\n  - Citizen Advisory: Empty stagnant water coolers and overhead containers within 48 hours.\n**Ward ZONE_SOUTH (Alert RED, True Risk 0.65, Confidence 0.34):**\n  - Vector Control Directive: Immediate adulticide spraying and source reduction authorized.\n  - Clinical Guidance: Mobilize triage beds at nearest referral facility; distribute diagnostic kits.\n  - Citizen Advisory: Empty stagnant water coolers and overhead containers within 48 hours.\n**Ward ZONE_EAST (Alert ORANGE, True Risk 0.05, Confidence 0.31):**\n  - Vector Control Directive: Immediate adulticide spraying and source reduction authorized.\n  - Clinical Guidance: Mobilize triage beds at nearest referral facility; distribute diagnostic kits.\n  - Citizen Advisory: Empty stagnant water coolers and overhead containers within 48 hours.\n**Ward ZONE_WEST (Alert ORANGE, True Risk 0.05, Confidence 0.31):**\n  - Vector Control Directive: Immediate adulticide spraying and source reduction authorized.\n  - Clinical Guidance: Mobilize triage beds at nearest referral facility; distribute diagnostic kits.\n  - Citizen Advisory: Empty stagnant water coolers and overhead containers within 48 hours.\n\n**SPECIAL SURVEILLANCE DIRECTIVE (Under-Reporting Hotspots):**\n  - Ward ZONE_SLUM_LAKE exhibits low clinic reporting despite high Breteau larval index. Active door-to-door fever screening squads dispatched to prevent unobserved contagion.\n---\n*Report generated deterministically by the Adaptive Dengue Surveillance Coordinator.*"
+}

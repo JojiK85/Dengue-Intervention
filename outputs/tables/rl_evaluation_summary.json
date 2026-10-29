@@ -1,0 +1,49 @@
+{
+  "policies": {
+    "No_Intervention": {
+      "mean_episode_reward": -933.94,
+      "std_episode_reward": 142.4,
+      "mean_infections": 778.28,
+      "mean_bed_overflow": 0.0,
+      "mean_intervention_cost": 0.0
+    },
+    "Random_Policy": {
+      "mean_episode_reward": -527.5,
+      "std_episode_reward": 72.78,
+      "mean_infections": 312.39,
+      "mean_bed_overflow": 0.0,
+      "mean_intervention_cost": 610.5
+    },
+    "Greedy_Heuristic": {
+      "mean_episode_reward": -935.37,
+      "std_episode_reward": 145.3,
+      "mean_infections": 776.8,
+      "mean_bed_overflow": 0.0,
+      "mean_intervention_cost": 12.83
+    },
+    "MDP_Value_Iteration": {
+      "mean_episode_reward": -598.13,
+      "std_episode_reward": 83.07,
+      "mean_infections": 443.3,
+      "mean_bed_overflow": 0.0,
+      "mean_intervention_cost": 264.67
+    },
+    "Q_Learning_Agent": {
+      "mean_episode_reward": -366.43,
+      "std_episode_reward": 125.21,
+      "mean_infections": 248.51,
+      "mean_bed_overflow": 0.0,
+      "mean_intervention_cost": 272.83
+    },
+    "SARSA_Agent": {
+      "mean_episode_reward": -332.19,
+      "std_episode_reward": 47.12,
+      "mean_infections": 217.41,
+      "mean_bed_overflow": 0.0,
+      "mean_intervention_cost": 285.17
+    }
+  },
+  "mdp_iterations": 111,
+  "q_learning_final_epsilon": 0.05,
+  "sarsa_final_epsilon": 0.05
+}

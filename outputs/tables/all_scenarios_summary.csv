@@ -1,0 +1,9 @@
+scenario_id,name,trigger,module_response,system_status,key_metric
+1,Sudden Case Surge,Cases spiked to 65 in ZONE_NORTH,Module 3 elevated alert to RED; Module 1 diverted patients to HOSP_NORTH_SUBDIV,SUCCESS,"Alert=RED, Path=1.4min"
+2,Under-Reporting Detection,Reported cases=2 in ZONE_SOUTH despite Breteau=34 and Rain=55mm,Module 3 flagged under-reporting=True; estimated true burden=9.0 cases,SUCCESS,"UnderreportingFlag=True, TrueCasesEst=9.0"
+3,Mosquito-Density Spike,Breteau index spiked to 48.0 in ZONE_EAST and ZONE_SLUM_LAKE,Module 1 BFS detected 1 spatial contagion clusters; Planner scheduled source reduction,SUCCESS,ClustersDetected=1
+4,Heavy Monsoon Rainfall,85mm torrential downpour,Module 2 Replanner suspended outdoor adulticide fogging; pivoted to indoor drainage cleanup,SUCCESS,ReplanningEvents=1
+5,Diagnostic-Kit Shortage,City-wide diagnostic kit inventory crashed to 30 kits,Module 1 CSP detected conflict (status=INFEASIBLE_RELAXED); executed relaxed best-effort allocation,SUCCESS,"IsRelaxed=True, ConflictLogs=1"
+6,Field-Team Outage,Municipal squads reduced from 5 to 1 active team,Module 1 Search generated multi-stop vehicle route (transit time: 25.5 min),SUCCESS,RouteTime=25.5min
+7,Hospital Crowding & Diversion,Central Civil Hospital reached 100% saturation (0 available beds),Module 1 A* successfully diverted ambulances to secondary facility HOSP_NORTH_SUBDIV,SUCCESS,DivertedTo=HOSP_NORTH_SUBDIV
+8,Misleading Citizen Reports,85 unverified citizen complaint calls flooded ZONE_WEST,"Module 3 Bayes Net grounded risk in entomological priors (alert=GREEN, confidence=0.605)",SUCCESS,"Alert=GREEN, ConfidenceScore=0.605"

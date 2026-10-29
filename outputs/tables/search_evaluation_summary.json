@@ -1,0 +1,15 @@
+{
+  "total_benchmark_queries": 72,
+  "average_nodes_expanded": {
+    "BFS": 7.22,
+    "DFS": 6.56,
+    "UCS": 6.33,
+    "A*": 4.78
+  },
+  "average_runtime_us": {
+    "BFS": 11.07,
+    "DFS": 12.58,
+    "UCS": 18.89,
+    "A*": 25.02
+  }
+}

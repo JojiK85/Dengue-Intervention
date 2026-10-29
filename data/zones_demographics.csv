@@ -1,0 +1,7 @@
+zone_id,zone_name,lat,lon,population,area_sq_km,vulnerability_tier,clinic_access_ratio,underreporting_factor,initial_cases,initial_breteau,hospital_bed_capacity,initial_hospital_beds_occupied,initial_diagnostic_kits
+ZONE_CENTRAL,Central Commercial Ward,20.2961,85.8245,95000,6.5,Low,0.88,2.1,18,14.5,60,28,120
+ZONE_NORTH,Northern Dense Settlement,20.32,85.815,120000,8.2,High,0.42,4.2,24,32.0,45,35,80
+ZONE_SOUTH,Southern Industrial & Peri-Urban,20.265,85.835,85000,11.0,High,0.35,4.5,8,28.5,30,22,60
+ZONE_EAST,Eastern Residential Suburb,20.285,85.865,70000,7.4,Medium,0.65,3.0,12,18.0,40,15,90
+ZONE_WEST,Western Institutional / University Area,20.305,85.78,65000,9.0,Low,0.82,2.2,6,12.0,35,10,100
+ZONE_SLUM_LAKE,Lakefront Informal Settlement,20.275,85.81,55000,4.1,High,0.28,4.8,4,38.0,20,16,40
