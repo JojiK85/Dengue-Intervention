@@ -73,8 +73,6 @@ class ZoneSnapshot:
     alert_level: str = "GREEN"
     underreporting_flag: bool = False
     confidence_score: float = 0.85
-    rl_action: Optional[str] = "Routine_Monitoring"
-    rl_reward: float = 0.0
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)

@@ -12,7 +12,6 @@ from src.module1_search import SearchEvaluator
 from src.module1_csp import DengueResourceAllocator
 from src.module2_planning import InterventionPlanner, OnlineExecutionMonitor
 from src.module3_uncertainty import ZoneRiskEstimator
-from src.module4_rl import run_all_rl_experiments
 from src.coordinator import AdaptiveDengueCoordinator
 from src.scenario_runner import ScenarioRunner
 from src.visualizer import generate_all_plots
@@ -24,7 +23,7 @@ def print_banner():
 ================================================================================
    ADAPTIVE DENGUE SURVEILLANCE & INTERVENTION COORDINATOR (GROUP 9)
    Course: CS4L002 Artificial Intelligence | IIT Bhubaneswar
-   Core Modules: Search (1), CSP (1), Planning (2), Bayes Net (3), MDP/RL (4)
+   Core Modules: Search & CSP (1), Classical Planning (2), Bayes Net (3)
 ================================================================================
 """
     print(banner)
@@ -33,7 +32,7 @@ def main():
     parser = argparse.ArgumentParser(description="Adaptive Dengue Surveillance Coordinator Master Runner")
     parser.add_argument("--days", type=int, default=30, help="Number of longitudinal simulation days (default: 30)")
     parser.add_argument("--scenarios", action="store_true", help="Execute all 8 mandatory public health stress scenarios")
-    parser.add_argument("--benchmark", action="store_true", help="Execute complete algorithm benchmarks for Search and RL")
+    parser.add_argument("--benchmark", action="store_true", help="Execute complete algorithm benchmarks for Search and Uncertainty")
     parser.add_argument("--plots", action="store_true", help="Generate all publication-grade Matplotlib plots")
     parser.add_argument("--all", action="store_true", help="Execute full pipeline: 30 days + 8 scenarios + benchmarks + plots")
 
@@ -60,16 +59,12 @@ def main():
         print(scenarios_df[["scenario_id", "name", "system_status", "key_metric"]].to_string(index=False))
 
     if args.benchmark or args.all:
-        logger.info("[Step 5/6] Running Search and RL Comparative Benchmarks...")
+        logger.info("[Step 5/6] Running Search and Uncertainty Comparative Benchmarks...")
         search_eval = SearchEvaluator(city)
         search_df = search_eval.run_benchmark_comparison()
 
         risk_eval = ZoneRiskEstimator()
         risk_eval.demonstrate_dynamic_belief_updating()
-
-        rl_df = run_all_rl_experiments()
-        print("\n--- RL Policy Comparison ---")
-        print(rl_df.to_string(index=False))
 
     if args.plots or args.all:
         logger.info("[Step 6/6] Generating Publication-Grade Visualizations (Pure Matplotlib)...")

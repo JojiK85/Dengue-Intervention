@@ -27,13 +27,6 @@ from src.module3_uncertainty import (
     compute_shannon_entropy,
     compute_confidence_score
 )
-from src.module4_rl import (
-    DengueSimulationEnv,
-    ModelBasedMDPSolver,
-    TabularQLearningAgent,
-    SARSAAgent,
-    N_STATES
-)
 from src.coordinator import AdaptiveDengueCoordinator
 from src.scenario_runner import ScenarioRunner
 
@@ -284,65 +277,6 @@ def test_shannon_entropy_confidence_bounds():
     assert pytest.approx(compute_confidence_score(unif_dist), 0.01) == 0.0
 
 # ==========================================
-# MODULE 4: REINFORCEMENT LEARNING (5 tests)
-# ==========================================
-
-def test_g_seir_compartment_conservation():
-    env = DengueSimulationEnv(num_zones=4, horizon_steps=10, seed=42)
-    env.reset()
-    total_pop_start = np.sum(env.host_pop)
-    for _ in range(5):
-        _, _, done, _ = env.step(1)
-        if done:
-            break
-    total_pop_end = np.sum(env.host_pop)
-    assert pytest.approx(total_pop_start, 1e-2) == total_pop_end
-
-def test_action_impact_on_mosquito_mortality():
-    env_routine = DengueSimulationEnv(num_zones=4, horizon_steps=5, seed=42)
-    env_spray = DengueSimulationEnv(num_zones=4, horizon_steps=5, seed=42)
-    env_routine.reset()
-    env_spray.reset()
-    env_routine.step(0)
-    env_spray.step(3)
-    assert np.sum(env_spray.vector_pop) < np.sum(env_routine.vector_pop)
-
-def test_discrete_state_encoding_decoding():
-    env = DengueSimulationEnv(seed=42)
-    for alert in range(4):
-        for vec in range(3):
-            for strain in range(3):
-                for res in range(2):
-                    sid = env.state_tuple_to_id(alert, vec, strain, res)
-                    assert 0 <= sid < N_STATES
-                    a_dec, v_dec, s_dec, r_dec = env.id_to_state_tuple(sid)
-                    assert (a_dec, v_dec, s_dec, r_dec) == (alert, vec, strain, res)
-
-def test_mdp_value_iteration_convergence():
-    solver = ModelBasedMDPSolver(num_states=10, num_actions=4)
-    for s in range(10):
-        for a in range(4):
-            solver.P[s, a, min(9, s + 1)] = 0.8
-            solver.P[s, a, max(0, s - 1)] = 0.2
-            solver.R[s, a] = -float(s)
-    V, policy, it_count = solver.value_iteration(max_iterations=200)
-    assert it_count < 200
-    assert len(V) == 10
-    assert len(policy) == 10
-
-def test_q_learning_and_sarsa_training():
-    env = DengueSimulationEnv(num_zones=4, horizon_steps=10, seed=42)
-    q_agent = TabularQLearningAgent(seed=42)
-    q_rewards = q_agent.train(env, num_episodes=15)
-    assert len(q_rewards) == 15
-    assert q_agent.epsilon < 1.0
-
-    sarsa_agent = SARSAAgent(seed=42)
-    sarsa_rewards = sarsa_agent.train(env, num_episodes=15)
-    assert len(sarsa_rewards) == 15
-    assert sarsa_agent.epsilon < 1.0
-
-# ==========================================
 # SCENARIOS AND INTEGRATION TESTS (3 tests)
 # ==========================================
 
@@ -360,7 +294,6 @@ def test_full_coordinator_day_execution(coordinator_fixture):
     assert "city_summary" in day_res
     assert day_res["csp_status"] in ["FEASIBLE", "INFEASIBLE_RELAXED"]
     assert "critical_path" in day_res
-    assert "rl_action_selected" in day_res
     assert "sitrep" in day_res
     assert len(day_res["sitrep"]) > 100
 

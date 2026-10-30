@@ -10,7 +10,6 @@ from .module1_search import SearchResult, breadth_first_search, depth_first_sear
 from .module1_csp import Constraint, CSP, CSPSolver, ConflictExplainer, AllocationResult, DengueResourceAllocator
 from .module2_planning import ActionSchema, create_dengue_action_catalog, CPMTask, CriticalPathAnalyzer, InterventionPlanner, OnlineExecutionMonitor, generate_pddl_domain, generate_pddl_problem, export_pddl_files
 from .module3_uncertainty import Factor, BayesNode, DengueBayesianNetwork, VariableElimination, ZoneRiskEstimator, compute_shannon_entropy, compute_confidence_score
-from .module4_rl import DengueSimulationEnv, ModelBasedMDPSolver, TabularQLearningAgent, SARSAAgent, evaluate_policy, run_all_rl_experiments
 from .coordinator import AdaptiveDengueCoordinator, generate_deterministic_sitrep
 from .scenario_runner import ScenarioRunner
 from .visualizer import generate_all_plots

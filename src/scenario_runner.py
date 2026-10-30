@@ -167,7 +167,6 @@ class ScenarioRunner:
             f.write("- **CSP:** Handled severe diagnostic kit stockouts with conflict explanations and relaxed best-effort allocations.\n")
             f.write("- **Planning:** Execution monitor repaired schedules dynamically on monsoon downpours and case surges.\n")
             f.write("- **Uncertainty:** Decoupled true risk from clinical reporting bias, successfully detecting under-reporting in peri-urban wards.\n")
-            f.write("- **RL / MDP:** Evaluated G-SEIR policy decisions mitigating outbreak spread.\n")
 
         logger.info(f"Saved scenario evaluation results to {csv_path} and {md_path}")
         return df

@@ -21,4 +21,3 @@ All 8 required scenarios from `Group 9 - Disease Prevention.pdf` were executed a
 - **CSP:** Handled severe diagnostic kit stockouts with conflict explanations and relaxed best-effort allocations.
 - **Planning:** Execution monitor repaired schedules dynamically on monsoon downpours and case surges.
 - **Uncertainty:** Decoupled true risk from clinical reporting bias, successfully detecting under-reporting in peri-urban wards.
-- **RL / MDP:** Evaluated G-SEIR policy decisions mitigating outbreak spread.

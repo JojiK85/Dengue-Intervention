@@ -18,7 +18,7 @@ Vector-borne viral epidemics in rapidly urbanizing Indian municipalities present
 3. **Environmental Volatility:** Sudden monsoon downpours wash away chemical adulticides, wasting scarce public-health budgets and accelerating mosquito breeding.
 4. **Mobility-Driven Spread:** Human commuter flux rapidly disseminates viral serotypes across non-adjacent municipal wards.
 
-Our student group has synthesized four foundational AI paradigms taught in our classroom lectures—**Spatial Graph Search**, **Constraint Satisfaction Problems (CSP)**, **Classical & Temporal Intervention Planning (STRIPS / CPM)**, **Probabilistic Reasoning Under Uncertainty (Bayesian Networks)**, and **Markov Decision Processes & Reinforcement Learning (MDP / RL)**—into a unified, deterministic digital-twin coordinator operating over a 30-day longitudinal municipal cycle.
+Our student group has synthesized foundational AI paradigms taught in our classroom lectures—**Spatial Graph Search**, **Constraint Satisfaction Problems (CSP)**, **Classical & Temporal Intervention Planning (STRIPS / CPM)**, and **Probabilistic Reasoning Under Uncertainty (Bayesian Networks)**—into a unified, deterministic digital-twin coordinator operating over a 30-day longitudinal municipal cycle.
 
 ---
 
@@ -30,14 +30,12 @@ In an urban municipality with multiple wards, hospitals, testing laboratories, a
 - How to allocate scarce field squads, diagnostic kits, and surge beds across wards under hard capacity constraints and budget ceilings?
 - How to optimally route acute patients to hospitals with available beds when central tertiary facilities reach 100% saturation?
 - How to sequence public-health interventions, extract concurrent parallel actions, identify schedule bottlenecks via the Critical Path Method (CPM), and dynamically replan when disruptions (case surges, vehicle breakdowns, monsoon rainfall) occur?
-- How to learn adaptive, long-term intervention policies that balance disease containment against intervention costs and hospital overflows?
 
 ### Core Objectives
 1. **Spatial Pathfinding & Cluster Analysis:** Formulate an urban dual-layer graph ($G_{\text{mobility}}$ and $G_{\text{infra}}$) and implement explicit classroom search algorithms (BFS, DFS, UCS, $A^*$) with admissible Haversine heuristics to detect transmission clusters, trace contagion pathways, and divert patients.
 2. **Scarcity-Aware Resource Allocation:** Formulate team, kit, and bed distribution as a formal CSP. Enforce hard constraints via AC-3 Arc Consistency, Forward Checking, and MRV/LCV heuristics; provide automated conflict explanations and relaxed best-effort allocations during stockouts.
 3. **Causal Action Planning with Online Schedule Repair:** Model 8 public-health actions as STRIPS schemas, partition plans into concurrent parallel stages, apply the Critical Path Method (CPM) to identify scheduling slack, and perform dynamic replanning under disruptions.
 4. **Exact Probabilistic Risk Estimation:** Model unobserved epidemiological states using a discrete Bayesian Network with exact Variable Elimination in pure Python, decoupling true latent risk from clinical reporting bias and computing Shannon entropy confidence scores.
-5. **Sequential Decision-Making via MDP / RL:** Build a discrete-time spatial dengue simulator grounded in coupled Host-Vector G-SEIR compartmental dynamics. Solve via model-based Bellman Value/Policy Iteration and train model-free Tabular Q-Learning and SARSA agents benchmarked against classical public-health baselines.
 
 ---
 
@@ -180,20 +178,19 @@ final_project/
 │   ├── module1_csp.py                 # Module 1: CSP, AC-3, Backtracking (MRV/LCV), DengueResourceAllocator, Explainer
 │   ├── module2_planning.py            # Module 2: STRIPS actions, Planner, CPM, OnlineExecutionMonitor, PDDL export
 │   ├── module3_uncertainty.py         # Module 3: Factor math, BayesNet, VariableElimination, Under-Reporting, Entropy
-│   ├── module4_rl.py                  # Module 4: Coupled G-SEIR simulation env, MDP Solver, Q-Learning, SARSA, Baselines
 │   ├── coordinator.py                 # Master AdaptiveDengueCoordinator & deterministic SITREP generator
 │   ├── scenario_runner.py             # Evaluator for all 8 mandatory public-health stress scenarios
 │   └── visualizer.py                  # Publication-grade plotting engine for all 8 figures (Pure Matplotlib)
 │
 ├── tests/                             # Consolidated test suite (pytest)
 │   ├── __init__.py
-│   └── test_all.py                    # Complete test suite: 29 unit, integration, and scenario tests
+│   └── test_all.py                    # Complete test suite: 24 unit, integration, and scenario tests
 │
 └── outputs/                           # Verifiable output artifacts generated on disk
     ├── logs/                          # Daily simulation JSON state logs (city_state_day01.json to day30.json)
     ├── reports/                       # scenario_evaluation_report.md
     ├── tables/                        # CSV and JSON benchmark and policy comparison tables
-    └── plots/                         # 8 publication-grade PNG plots (Gantt, heatmaps, learning curves)
+    └── plots/                         # 6 publication-grade PNG plots (Gantt, heatmaps, networks)
 ```
 
 ---

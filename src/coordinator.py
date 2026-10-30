@@ -7,7 +7,6 @@ from src.module1_search import SearchEvaluator
 from src.module1_csp import DengueResourceAllocator, AllocationResult
 from src.module2_planning import InterventionPlanner, OnlineExecutionMonitor
 from src.module3_uncertainty import ZoneRiskEstimator
-from src.module4_rl import DengueSimulationEnv, TabularQLearningAgent
 
 logger = setup_logger("coordinator")
 
@@ -24,7 +23,7 @@ def generate_deterministic_sitrep(
     sitrep_lines = [
         f"# MUNICIPAL DENGUE SITUATION REPORT (SITREP) - DAY {day:02d}",
         f"**Jurisdiction:** Urban Municipal Corporation | **Surveillance Cycle:** Longitudinal 30-Day Simulation",
-        f"**Deterministic Decision-Support Engine:** Modules 1-4 (Search, CSP, Planning, Bayes Net, MDP/RL)",
+        f"**Deterministic Decision-Support Engine:** Modules 1-3 (Search & CSP, Classical Planning, Bayesian Uncertainty)",
         "---",
         "### 1. Epidemiological Summary",
         f"- **Total Clinically Reported Cases:** {summary['total_confirmed_cases']}",
@@ -74,10 +73,6 @@ class AdaptiveDengueCoordinator:
         target_zones = self.city_state.get_zone_ids()
         self.planner = InterventionPlanner(target_zones)
         self.monitor = OnlineExecutionMonitor(target_zones)
-
-        self.rl_env = DengueSimulationEnv(num_zones=len(target_zones), horizon_steps=30, seed=42)
-        self.rl_agent = TabularQLearningAgent(seed=42)
-        self.rl_agent.train(self.rl_env, num_episodes=50)
 
     def run_day(
         self,
@@ -151,14 +146,6 @@ class AdaptiveDengueCoordinator:
         stages = self.planner.analyze_parallel_stages(multi_zone_plan)
         cpm_tasks, critical_path, project_duration = self.planner.build_cpm_schedule(multi_zone_plan)
 
-        current_rl_state = self.rl_env.get_discrete_state()
-        rl_action = self.rl_agent.select_action(current_rl_state, evaluate=True)
-        next_rl_state, reward, done, rl_info = self.rl_env.step(rl_action)
-
-        for snap in self.city_state.zone_snapshots.values():
-            snap.rl_action = DengueSimulationEnv.ACTION_NAMES[rl_action]
-            snap.rl_reward = round(reward, 2)
-
         sitrep_text = generate_deterministic_sitrep(self.city_state, day, csp_result.status, critical_path)
 
         daily_summary = {
@@ -171,8 +158,6 @@ class AdaptiveDengueCoordinator:
             "planning_stages_count": len(stages),
             "critical_path": critical_path,
             "project_duration_days": project_duration,
-            "rl_action_selected": DengueSimulationEnv.ACTION_NAMES[rl_action],
-            "rl_step_reward": round(reward, 2),
             "sitrep": sitrep_text
         }
 

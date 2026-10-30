@@ -8,6 +8,7 @@ import pandas as pd
 import networkx as nx
 
 from src.city_state import CityState, get_outputs_dir, setup_logger
+from src.module1_csp import DengueResourceAllocator
 
 logger = setup_logger("visualizer")
 
@@ -56,24 +57,65 @@ def generate_all_plots(city_state: CityState, output_dir: Optional[Path] = None)
         logger.error(f"Error plotting search_comparison: {e}")
 
     try:
-        fig, ax = plt.subplots(figsize=(9, 4.8))
+        fig, ax = plt.subplots(figsize=(10, 5.2))
         zones = city_state.get_zone_ids()
-        short_names = [z.replace("ZONE_", "") for z in zones]
-        teams = [city_state.zone_snapshots[z].teams_active for z in zones]
-        kits = [city_state.zone_snapshots[z].kits_remaining for z in zones]
+        
+        allocator = DengueResourceAllocator(city_state)
+        current_teams = [city_state.zone_snapshots[z].teams_active for z in zones]
+        
+        # If current snapshot has 0 active teams (e.g. post-simulation Day 30),
+        # evaluate the CSP Allocator on representative multi-tier outbreak demand
+        if sum(current_teams) == 0:
+            active_risks = {
+                "ZONE_NORTH": "RED",
+                "ZONE_SLUM_LAKE": "RED",
+                "ZONE_SOUTH": "ORANGE",
+                "ZONE_EAST": "YELLOW",
+                "ZONE_CENTRAL": "GREEN",
+                "ZONE_WEST": "GREEN"
+            }
+            alloc_res = allocator.allocate_resources(
+                zone_risks=active_risks,
+                available_teams=5,
+                total_kits=350,
+                total_beds=80
+            )
+            teams = [alloc_res.allocation[z]["teams"] for z in zones]
+            kits = [alloc_res.allocation[z]["kits"] for z in zones]
+            labels = [f"{z.replace('ZONE_', '')}\n({active_risks[z]})" for z in zones]
+            subtitle = "(Solver: AC-3 Arc Consistency & MRV Backtracking under High Scarcity)"
+        else:
+            teams = current_teams
+            kits = [city_state.zone_snapshots[z].kits_remaining for z in zones]
+            labels = [f"{z.replace('ZONE_', '')}\n({city_state.zone_snapshots[z].alert_level})" for z in zones]
+            subtitle = f"(Day {city_state.current_day} Operational Municipal Allocation)"
+
         x = np.arange(len(zones))
         width = 0.35
 
-        ax.bar(x - width/2, teams, width, label="Inspection Teams", color="#2980b9", edgecolor="black")
-        ax.set_ylabel("Inspection Teams Allocated", color="#2980b9")
+        ax.bar(x - width/2, teams, width, label="Inspection Teams (Squads)", color="#2980b9", edgecolor="black", alpha=0.9)
+        ax.set_ylabel("Inspection Teams Allocated (Squads)", color="#2980b9", fontweight="bold")
         ax.set_xticks(x)
-        ax.set_xticklabels(short_names, rotation=15)
-        ax.set_title("Module 1: CSP Scarcity-Aware Resource Allocation Across Wards", fontweight="bold")
+        ax.set_xticklabels(labels, fontsize=9)
+        ax.set_ylim(0, max(teams) + 1.2)
+        ax.yaxis.set_major_locator(plt.MaxNLocator(integer=True))
+        ax.set_title(f"Module 1: CSP Scarcity-Aware Resource Allocation Across Wards\n{subtitle}", fontweight="bold", fontsize=11)
 
         ax_twin = ax.twinx()
-        ax_twin.bar(x + width/2, kits, width, label="Diagnostic Kits", color="#27ae60", edgecolor="black")
-        ax_twin.set_ylabel("Diagnostic Test Kits Distributed", color="#27ae60")
+        ax_twin.bar(x + width/2, kits, width, label="Diagnostic Kits Distributed", color="#27ae60", edgecolor="black", alpha=0.9)
+        ax_twin.set_ylabel("Diagnostic Test Kits Distributed (Units)", color="#27ae60", fontweight="bold")
+        ax_twin.set_ylim(0, max(kits) + 25)
+        ax_twin.yaxis.set_major_locator(plt.MaxNLocator(integer=True))
         ax_twin.grid(False)
+
+        for i, t in enumerate(teams):
+            if t > 0:
+                ax.text(i - width/2, t + 0.06, f"{t} squad", ha="center", va="bottom", fontsize=8.5, fontweight="bold", color="#1b4f72")
+            else:
+                ax.text(i - width/2, 0.06, "0", ha="center", va="bottom", fontsize=8.5, color="gray")
+
+        for i, k in enumerate(kits):
+            ax_twin.text(i + width/2, k + 2.0, f"{k} kits", ha="center", va="bottom", fontsize=8.5, fontweight="bold", color="#145a32")
 
         lines1, labels1 = ax.get_legend_handles_labels()
         lines2, labels2 = ax_twin.get_legend_handles_labels()
@@ -112,7 +154,7 @@ def generate_all_plots(city_state: CityState, output_dir: Optional[Path] = None)
         ax.invert_yaxis()
         ax.set_xlabel("Project Timeline (Days)")
         ax.set_title("Module 2: Activity-On-Node Critical Path Method (CPM) Schedule", fontweight="bold")
-        ax.legend(loc="lower right")
+        ax.legend(loc="upper right")
 
         plt.tight_layout()
         p3 = output_dir / "critical_path_gantt.png"
@@ -177,69 +219,62 @@ def generate_all_plots(city_state: CityState, output_dir: Optional[Path] = None)
         logger.error(f"Error plotting belief_updating_timeline: {e}")
 
     try:
-        fig, ax = plt.subplots(figsize=(9, 4.5))
-        episodes = np.arange(1, 251)
-        q_curve = -180.0 + 130.0 * (1.0 - np.exp(-episodes / 45.0)) + np.random.normal(0, 4.0, len(episodes))
-        sarsa_curve = -195.0 + 120.0 * (1.0 - np.exp(-episodes / 55.0)) + np.random.normal(0, 5.0, len(episodes))
-
-        ax.plot(episodes, q_curve, label="Tabular Q-Learning (Off-Policy TD)", color="#e67e22", alpha=0.85)
-        ax.plot(episodes, sarsa_curve, label="SARSA (On-Policy TD)", color="#8e44ad", alpha=0.75)
-        ax.set_xlabel("Training Episodes")
-        ax.set_ylabel("Cumulative Episode Reward")
-        ax.set_title("Module 4: Reinforcement Learning Episode Reward Convergence", fontweight="bold")
-        ax.legend(loc="lower right")
-
-        plt.tight_layout()
-        p6 = output_dir / "rl_learning_curves.png"
-        fig.savefig(p6, dpi=200)
-        plt.close(fig)
-        generated_plots["rl_learning"] = p6
-    except Exception as e:
-        logger.error(f"Error plotting rl_learning_curves: {e}")
-
-    try:
-        fig, ax = plt.subplots(figsize=(9, 4.8))
-        policies = ["No-Intervention", "Random", "Greedy Heuristic", "MDP Value Iter.", "Q-Learning", "SARSA"]
-        mean_rewards = [-245.5, -188.2, -135.0, -82.4, -86.5, -92.1]
-        colors = ["#7f8c8d", "#95a5a6", "#d35400", "#27ae60", "#2ecc71", "#1abc9c"]
-
-        bars = ax.bar(policies, mean_rewards, color=colors, edgecolor="black", alpha=0.85)
-        ax.set_ylabel("Mean Evaluation Episode Reward")
-        ax.set_title("Module 4: Quantitative Policy Benchmark Evaluation", fontweight="bold")
-        ax.set_xticks(range(len(policies)))
-        ax.set_xticklabels(policies, rotation=15)
-
-        for b in bars:
-            h = b.get_height()
-            ax.text(b.get_x() + b.get_width()/2, h - 10, f"{h:.1f}", ha="center", va="top", fontweight="bold", color="black")
-
-        plt.tight_layout()
-        p7 = output_dir / "policy_comparison_bar.png"
-        fig.savefig(p7, dpi=200)
-        plt.close(fig)
-        generated_plots["policy_comparison"] = p7
-    except Exception as e:
-        logger.error(f"Error plotting policy_comparison_bar: {e}")
-
-    try:
-        fig, ax = plt.subplots(figsize=(9, 6))
+        fig, ax = plt.subplots(figsize=(10, 7))
         G = city_state.infra_graph
-        pos = {n: (float(d.get("lon", 85.82)), float(d.get("lat", 20.29))) for n, d in G.nodes(data=True)}
+
+        custom_pos = {
+            "ZONE_NORTH": (0.0, 2.1),
+            "HOSP_NORTH_SUBDIV": (0.9, 2.4),
+            "ZONE_WEST": (-2.5, 0.5),
+            "ZONE_EAST": (2.5, -0.4),
+            "ZONE_CENTRAL": (0.0, 0.0),
+            "HOSP_CIVIL_CENTRAL": (-0.8, 0.6),
+            "DEPOT_CENTRAL_VECTOR": (-0.8, -0.6),
+            "LAB_MUNICIPAL_PCR": (0.8, 0.5),
+            "ZONE_SLUM_LAKE": (-1.5, -1.4),
+            "ZONE_SOUTH": (0.2, -2.1),
+            "HOSP_SOUTH_GENERAL": (1.1, -2.4)
+        }
+
         zone_nodes = [n for n, d in G.nodes(data=True) if d.get("node_type") == "zone"]
         hosp_nodes = [n for n, d in G.nodes(data=True) if d.get("node_type") == "hospital"]
         other_nodes = [n for n, d in G.nodes(data=True) if d.get("node_type") not in ["zone", "hospital"]]
 
-        nx.draw_networkx_nodes(G, pos, nodelist=zone_nodes, node_color="#3498db", node_size=600, label="Municipal Wards", ax=ax)
-        nx.draw_networkx_nodes(G, pos, nodelist=hosp_nodes, node_color="#e74c3c", node_size=800, node_shape="s", label="Hospitals", ax=ax)
-        if other_nodes:
-            nx.draw_networkx_nodes(G, pos, nodelist=other_nodes, node_color="#f1c40f", node_size=500, node_shape="^", label="Depots / Labs", ax=ax)
+        nx.draw_networkx_edges(G, custom_pos, edge_color="#95a5a6", alpha=0.6, width=1.8, ax=ax)
 
-        nx.draw_networkx_edges(G, pos, edge_color="gray", alpha=0.6, width=1.5, ax=ax)
-        labels = {n: n.replace("ZONE_", "").replace("HOSP_", "H_").replace("DEPOT_", "D_").replace("LAB_", "L_") for n in G.nodes()}
-        nx.draw_networkx_labels(G, pos, labels, font_size=8, font_weight="bold", ax=ax)
+        nx.draw_networkx_nodes(G, custom_pos, nodelist=zone_nodes, node_color="#3498db", node_size=800, ax=ax, edgecolors="black", linewidths=1.5)
+        nx.draw_networkx_nodes(G, custom_pos, nodelist=hosp_nodes, node_color="#e74c3c", node_size=800, node_shape="s", ax=ax, edgecolors="black", linewidths=1.5)
+        nx.draw_networkx_nodes(G, custom_pos, nodelist=other_nodes, node_color="#f39c12", node_size=750, node_shape="^", ax=ax, edgecolors="black", linewidths=1.5)
 
-        ax.set_title("Spatial Contagion & Healthcare Infrastructure Graph (G_t)", fontweight="bold")
-        ax.legend(loc="lower right")
+        labels = {
+            "ZONE_CENTRAL": "Central Ward\n(95k pop)",
+            "ZONE_NORTH": "North Ward\n(120k pop)",
+            "ZONE_SOUTH": "South Ward\n(85k pop)",
+            "ZONE_EAST": "East Ward\n(70k pop)",
+            "ZONE_WEST": "West Ward\n(65k pop)",
+            "ZONE_SLUM_LAKE": "Slum Lake\n(55k pop)",
+            "HOSP_CIVIL_CENTRAL": "Central Hospital\n(120 beds)",
+            "HOSP_NORTH_SUBDIV": "North Hospital\n(60 beds)",
+            "HOSP_SOUTH_GENERAL": "South Hospital\n(50 beds)",
+            "DEPOT_CENTRAL_VECTOR": "Vector Depot\n(HQ)",
+            "LAB_MUNICIPAL_PCR": "PCR Lab\n(Testing)"
+        }
+
+        for n, (x, y) in custom_pos.items():
+            text_color = "#1a5276" if n in zone_nodes else ("#78281f" if n in hosp_nodes else "#7e5109")
+            bbox_props = dict(boxstyle="round,pad=0.25", facecolor="white", edgecolor="#bdc3c7", alpha=0.92, linewidth=0.8)
+            ax.text(x, y + 0.20, labels[n], fontsize=8, ha="center", va="bottom", fontweight="bold", color=text_color, bbox=bbox_props)
+
+        legend_elements = [
+            plt.Line2D([0], [0], marker="o", color="w", markerfacecolor="#3498db", markeredgecolor="black", markersize=10, label="Municipal Wards (Population Centers)"),
+            plt.Line2D([0], [0], marker="s", color="w", markerfacecolor="#e74c3c", markeredgecolor="black", markersize=10, label="Hospitals (Emergency Surge Beds)"),
+            plt.Line2D([0], [0], marker="^", color="w", markerfacecolor="#f39c12", markeredgecolor="black", markersize=10, label="Vector Control Depot / PCR Lab")
+        ]
+        ax.legend(handles=legend_elements, loc="upper left", framealpha=0.95, edgecolor="#bdc3c7", fontsize=9)
+
+        ax.set_title("Spatial Contagion & Healthcare Infrastructure Graph (G_t)\nBhubaneswar Municipal Corporation — 6 Wards & 5 Critical Health Facilities", fontweight="bold", fontsize=12, pad=12)
+        ax.set_xlim(-3.1, 3.1)
+        ax.set_ylim(-3.0, 3.2)
         ax.axis("off")
 
         plt.tight_layout()
